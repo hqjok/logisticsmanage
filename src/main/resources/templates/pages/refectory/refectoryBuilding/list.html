@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html>
+
+<head th:insert="~{commons::head('食堂管理',~{},~{},~{::script})}">
+	<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+	<!--[if lt IE 9]>
+	<script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+	<script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+</head>
+
+
+<body>
+	<div class="weadmin-nav">
+		<span class="layui-breadcrumb">
+			<a href="">首页</a>
+			<a href="">食堂管理</a>
+			<a><cite>食堂楼栋管理</cite></a>
+		</span>
+		<a class="layui-btn layui-btn-sm" style="line-height:1.6em;margin-top:3px;float:right"
+			href="javascript:location.replace(location.href);" title="刷新">
+			<i class="layui-icon" style="line-height:30px">ဂ</i></a>
+	</div>
+	<div class="weadmin-body">
+		<div class="layui-row">
+			<form class="layui-form layui-col-md12 we-search">
+
+				<div class="layui-inline">
+					<input th:value="${result.condition.address}!=null?${result.condition.address}:''" type="text" name="address" placeholder="按楼栋地址查询" autocomplete="off" class="layui-input">
+				</div>
+				<div class="layui-inline">
+					<input th:value="${result.condition.director}!=null?${result.condition.director}:''" type="text" name="director" placeholder="负责人名字查询" autocomplete="off" class="layui-input">
+				</div>
+				<div class="layui-inline">
+					<input th:value="${result.condition.company}!=null?${result.condition.company}:''" type="text" name="company" placeholder="所属公司查询" autocomplete="off" class="layui-input">
+				</div>
+				<div class="layui-inline">
+					<input th:value="${result.condition.telphone}!=null?${result.condition.telphone}:''" type="text" name="telphone" placeholder="电话号码" autocomplete="off" class="layui-input">
+				</div>
+				<button class="layui-btn" lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+			</form>
+		</div>
+		<div class="weadmin-block">
+			<button class="layui-btn layui-btn-danger" onclick="_deleteSelectItem('refectory','http://localhost:8080/canteen/batch/delete', ()=>{
+					location.reload()
+				})">
+				<i class="layui-icon"></i>批量删除
+			</button>
+			<button class="layui-btn" onclick="_dialogStatus('add')"><i class="layui-icon"></i>添加</button>
+			<span class="fr" style="line-height:40px;margin-right: 10px;">共有数据：[[${result.count}]] 条</span>
+		</div>
+		<table class="layui-table" id="refectory">
+			<thead>
+				<tr>
+					<th>
+						<div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i
+								class="layui-icon">&#xe605;</i></div>
+					</th>
+					<th>序号</th>
+					<th>楼栋地址</th>
+					<th>负责人</th>
+					<th>所属公司</th>
+					<th>性别</th>
+					<th>电话</th>
+					<th>创建时间</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="canteen:${result.returnList.getList()}">
+					<td>
+						<div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='2'><i
+								class="layui-icon">&#xe605;</i></div>
+					</td>
+					<td th:text="${canteen.id}">1</td>
+					<td th:text="${canteen.address}">华商东区东11栋</td>
+					<td th:text="${canteen.director}">孙某某</td>
+					<td th:text="${canteen.company}">广东无敌餐饮有限公司</td>
+					<td th:text="${canteen.sex}">男</td>
+					<td th:text="${canteen.telphone}">1008610086</td>
+					<td th:text="${#dates.format(canteen.createTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+					<td class="td-manage">
+						<a title="查看" onclick="_viewData($(this))" href="javascript:;">
+							<i class="layui-icon">&#xe63c;</i>
+						</a>
+						<a title="删除" th:onclick="_deleteById('http://localhost:8080/canteen/delete', [[${canteen.id}]])" href="javascript:;">
+							<i class="layui-icon">&#xe640;</i>
+						</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="page" th:if="${result.count > 0}">
+			<div>
+				<a class="prev" th:href="${result.returnList.getPrePage() == 0} ? 'javascript:return false' : ${result.returnList.getPrePage()}">&lt;&lt;</a>
+				<th:block th:each="i: ${#numbers.sequence(1, result.returnList.getPages())}">
+					<a class="num" th:if="${i != result.activeId}"
+					   th:href="'/canteen/manage/' + ${i}+
+			   '?address='+(${result.condition.address}==null?'':${result.condition.address})+
+			   '&director='+(${result.condition.director}==null?'':${result.condition.director})+
+			   '&telphone='+(${result.condition.telphone}==null?'':${result.condition.telphone})+
+			   '&company='+(${result.condition.company}==null?'':${result.condition.company})"
+					   th:text="${i}"></a>
+					<span th:if="${i == result.activeId}" class="current" th:text="${i}"></span>
+				</th:block>
+				<a class="next" th:href="${result.returnList.getNextPage() == 0} ? 'javascript:return false' : ${result.returnList.getNextPage()}">&gt;&gt;</a>
+			</div>
+		</div>
+
+	</div>
+	<div class="list-dialog" id="list-dialog">
+		<div class="dialog-container" style="height:600px">
+			<div class="dialog-hearder">
+				<a id="dialogTitle">修改信息</a>
+				<i class="layui-icon layui-icon-close" onclick="_dialogStatus()"></i>
+			</div>
+			<div class="dialog-content">
+				<form class="layui-form" id="editInfoData">
+					<div class="layui-form-item">
+						<label class="layui-form-label">
+							<span class="we-red"></span>序号
+						</label>
+						<div class="layui-input-inline">
+							<input type="text" name="id" placeholder="系统随机生成，非必填" disabled autocomplete="off"
+								class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">
+							<span class="we-red">*</span>楼栋地址
+						</label>
+						<div class="layui-input-inline">
+							<input type="text" name="address" required="" lay-verify="required" autocomplete="off"
+								class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">
+							<span class="we-red">*</span>负责人
+						</label>
+						<div class="layui-input-inline">
+							<input type="text" name="director" id="fromStartTime" required="" lay-verify="required" autocomplete="off"
+								class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">
+							<span class="we-red">*</span>所属公司
+						</label>
+						<div class="layui-input-inline">
+							<input type="text" name="company" required="" lay-verify="required" autocomplete="off"
+								class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">
+							<span class="we-red">*</span>性别
+						</label>
+						<div class="layui-input-inline">
+							<select name="sex" id="sexSelect" required="" lay-verify="required">
+								<option value="男">男</option>
+								<option value="女">女</option>
+							</select>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">
+							<span class="we-red">*</span>电话
+						</label>
+						<div class="layui-input-inline">
+							<input type="text" name="telphone" required="" lay-verify="required" autocomplete="off"
+								class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label for="L_repass" class="layui-form-label"></label>
+						<button id="submit_button" class="layui-btn" lay-submit lay-filter="formDemo">修改</button>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+	<script>
+		layui.extend({
+			admin: 'http://localhost:8080/static/js/admin'
+		});
+		layui.use(['laydate', 'jquery', 'admin','form'], function () {
+			var laydate = layui.laydate,
+				$ = layui.jquery,
+				admin = layui.admin,
+				form = layui.form;
+				//提交表单
+			form.on('submit(formDemo)', function (data) {
+				if(data.field.id){
+					_saveData('http://localhost:8080/canteen/modify',data.field,()=>{
+						location.reload()
+					})
+
+				}else {
+					_saveData('http://localhost:8080/canteen/add',data.field,()=>{
+						window.location.href='http://localhost:8080/canteen/manage/1'
+					})
+				}
+				return false;
+			});
+			
+		});
+
+	</script>
+</body>
+
+</html>

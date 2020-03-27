@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.logistics.manage.mapper.ShopPOMapper" >
+  <resultMap id="BaseResultMap" type="com.logistics.manage.entity.po.ShopPO" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_num" property="orderNum" jdbcType="VARCHAR" />
+    <result column="type_id" property="typeId" jdbcType="INTEGER" />
+    <result column="order_content" property="orderContent" jdbcType="VARCHAR" />
+    <result column="director_name" property="directorName" jdbcType="VARCHAR" />
+    <result column="director_telphone" property="directorTelphone" jdbcType="INTEGER" />
+    <result column="count_price" property="countPrice" jdbcType="DECIMAL" />
+    <result column="shop_time" property="shopTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <!---->
+  <delete id="batchDelete" parameterType="java.util.List" >
+    delete from tb_shop
+    where id in
+    <foreach collection="list" item="id" open="(" close=")" separator=",">
+      #{id,jdbcType=INTEGER}
+    </foreach>
+  </delete>
+  <!---->
+
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, order_num, type_id, order_content, director_name, director_telphone, count_price, 
+    shop_time, create_time
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.logistics.manage.entity.po.ShopPOExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from tb_shop
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_shop
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tb_shop
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.logistics.manage.entity.po.ShopPOExample" >
+    delete from tb_shop
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.logistics.manage.entity.po.ShopPO" >
+    insert into tb_shop (id, order_num, type_id, 
+      order_content, director_name, director_telphone, 
+      count_price, shop_time, create_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{orderNum,jdbcType=VARCHAR}, #{typeId,jdbcType=INTEGER}, 
+      #{orderContent,jdbcType=VARCHAR}, #{directorName,jdbcType=VARCHAR}, #{directorTelphone,jdbcType=INTEGER}, 
+      #{countPrice,jdbcType=DECIMAL}, #{shopTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.logistics.manage.entity.po.ShopPO" >
+    insert into tb_shop
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="orderNum != null" >
+        order_num,
+      </if>
+      <if test="typeId != null" >
+        type_id,
+      </if>
+      <if test="orderContent != null" >
+        order_content,
+      </if>
+      <if test="directorName != null" >
+        director_name,
+      </if>
+      <if test="directorTelphone != null" >
+        director_telphone,
+      </if>
+      <if test="countPrice != null" >
+        count_price,
+      </if>
+      <if test="shopTime != null" >
+        shop_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="orderNum != null" >
+        #{orderNum,jdbcType=VARCHAR},
+      </if>
+      <if test="typeId != null" >
+        #{typeId,jdbcType=INTEGER},
+      </if>
+      <if test="orderContent != null" >
+        #{orderContent,jdbcType=VARCHAR},
+      </if>
+      <if test="directorName != null" >
+        #{directorName,jdbcType=VARCHAR},
+      </if>
+      <if test="directorTelphone != null" >
+        #{directorTelphone,jdbcType=INTEGER},
+      </if>
+      <if test="countPrice != null" >
+        #{countPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="shopTime != null" >
+        #{shopTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.logistics.manage.entity.po.ShopPOExample" resultType="java.lang.Integer" >
+    select count(*) from tb_shop
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update tb_shop
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.orderNum != null" >
+        order_num = #{record.orderNum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.typeId != null" >
+        type_id = #{record.typeId,jdbcType=INTEGER},
+      </if>
+      <if test="record.orderContent != null" >
+        order_content = #{record.orderContent,jdbcType=VARCHAR},
+      </if>
+      <if test="record.directorName != null" >
+        director_name = #{record.directorName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.directorTelphone != null" >
+        director_telphone = #{record.directorTelphone,jdbcType=INTEGER},
+      </if>
+      <if test="record.countPrice != null" >
+        count_price = #{record.countPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="record.shopTime != null" >
+        shop_time = #{record.shopTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update tb_shop
+    set id = #{record.id,jdbcType=INTEGER},
+      order_num = #{record.orderNum,jdbcType=VARCHAR},
+      type_id = #{record.typeId,jdbcType=INTEGER},
+      order_content = #{record.orderContent,jdbcType=VARCHAR},
+      director_name = #{record.directorName,jdbcType=VARCHAR},
+      director_telphone = #{record.directorTelphone,jdbcType=INTEGER},
+      count_price = #{record.countPrice,jdbcType=DECIMAL},
+      shop_time = #{record.shopTime,jdbcType=TIMESTAMP},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.logistics.manage.entity.po.ShopPO" >
+    update tb_shop
+    <set >
+      <if test="orderNum != null" >
+        order_num = #{orderNum,jdbcType=VARCHAR},
+      </if>
+      <if test="typeId != null" >
+        type_id = #{typeId,jdbcType=INTEGER},
+      </if>
+      <if test="orderContent != null" >
+        order_content = #{orderContent,jdbcType=VARCHAR},
+      </if>
+      <if test="directorName != null" >
+        director_name = #{directorName,jdbcType=VARCHAR},
+      </if>
+      <if test="directorTelphone != null" >
+        director_telphone = #{directorTelphone,jdbcType=INTEGER},
+      </if>
+      <if test="countPrice != null" >
+        count_price = #{countPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="shopTime != null" >
+        shop_time = #{shopTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.logistics.manage.entity.po.ShopPO" >
+    update tb_shop
+    set order_num = #{orderNum,jdbcType=VARCHAR},
+      type_id = #{typeId,jdbcType=INTEGER},
+      order_content = #{orderContent,jdbcType=VARCHAR},
+      director_name = #{directorName,jdbcType=VARCHAR},
+      director_telphone = #{directorTelphone,jdbcType=INTEGER},
+      count_price = #{countPrice,jdbcType=DECIMAL},
+      shop_time = #{shopTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

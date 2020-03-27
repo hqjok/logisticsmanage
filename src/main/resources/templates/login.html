@@ -1,0 +1,71 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+
+<head th:insert="~{commons::head('后台登录',~{},~{},~{::script})}">
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body class="login-bg">
+
+    <div class="login">
+        <div class="message">华商电商平台后勤社区服务子平台</div>
+        <div id="darkbannerwrap"></div>
+        <span th:if="${errorMsg} != null" th:text="${errorMsg}" style="color: red;"></span>
+        <form class="layui-form" id="loginFrom" action="/member/login" method="post">
+            <input name="loginacct" placeholder="用户名" type="text" lay-verify="required" class="layui-input">
+            <hr class="hr15">
+            <input name="userpswd" lay-verify="required" placeholder="密码" type="password" class="layui-input">
+            <hr class="hr15">
+            <input class="loginin" value="登录" lay-submit lay-filter="login" style="width:100%;" type="submit">
+            <hr class="hr20">
+            <div>
+                没有账号？请联系管理员（897588524@qq.com）注册
+            </div>
+        </form>
+    </div>
+
+    <script type="text/javascript">
+
+        layui.extend({
+            admin: 'http://localhost:8080/static/js/admin'
+        });
+        layui.use(['form', 'admin'], function () {
+            var form = layui.form
+                , admin = layui.admin;
+            // layer.msg('玩命卖萌中', function(){
+            //   //关闭后的操作
+            //   });
+            //监听提交
+              form.on('submit(login)', function(data){
+                  console.log(data.field)
+                  $.ajax({
+                      url: 'http://localhost:8080/member/login',
+                      type: 'POST',
+                      data: data.field,
+                      success: function (res) {
+                          if(res == "success"){
+                              layer.msg("登陆成功！", {time: 1000},function(){
+                                  location.href='/go/to/index'
+                              });
+                          }else {
+                              layer.msg(res, {time: 2000},function(){
+
+                              });
+                          }
+                      }
+                  })
+
+                return false;
+              });
+        });   
+
+    </script>
+    <!-- 底部结束 -->
+</body>
+
+</html>

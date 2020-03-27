@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>华商后勤服务子平台</title>
+    <link th:href="@{/home/css/main.css}" rel="stylesheet">
+    <link th:href="@{/home/css/font-awesome-4.7.0/css/font-awesome.min.css}" rel="stylesheet">
+    <link th:href="@{/home/css/animate.css}" rel="stylesheet">
+    <link th:href="@{/home/css/elementUi.css}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" th:href="@{/home/css/util.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/home/css/login-main.css}">
+    <script th:src="@{/home/js/jquery-2.1.3.min.js}"></script>
+    <script th:src="@{/home/js/vue.min.js}"></script>
+    <script th:src="@{/home/js/elementUi.js}"></script>
+    <script th:src="@{/home/js/main.js}"></script>
+    <script th:src="@{/home/js/login-main.js}"></script>
+</head>
+
+<body>
+    <div id="app" v-loading="pageLoading">
+        <div class="limiter" v-show="!isLoginSuccess">
+            <div class="container-login100" style="background-color: rgb(239, 244, 250);">
+                <div class="wrap-login100 p-l-55 p-r-55 p-t-40 p-b-54">
+                    <form class="login100-form validate-form" v-on:submit.prevent="login">
+                        <span class="login100-form-title p-b-49">后勤服务子平台</span>
+
+                        <div class="wrap-input100 validate-input m-b-23" data-validate="请输入用户名">
+                            <span class="label-input100">用户名</span>
+                            <input class="input100" v-model="userName" type="text" placeholder="请输入用户名"
+                                autocomplete="off">
+                            <span class="focus-input100" data-symbol=""></span>
+                        </div>
+
+                        <div class="wrap-input100 validate-input" data-validate="请输入密码">
+                            <span class="label-input100">密码</span>
+                            <input class="input100" v-model="password" type="password" placeholder="请输入密码">
+                            <span class="focus-input100" data-symbol=""></span>
+                        </div>
+                        <div class="text-right p-t-8 p-b-31"></div>
+                        <div class="container-login100-form-btn">
+                            <div class="wrap-login100-form-btn">
+                                <div class="login100-form-bgbtn"></div>
+                                <button class="login100-form-btn">登 录</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <header v-if="isLoginSuccess">
+            <div class="logo">
+                <img class="logo" th:src="@{/home/img/logo.jpg}" />
+            </div>
+            <div class="title">华商后勤服务子平台</div>
+            <div class="user-status">
+                欢迎，{{userNickName}}
+                <span class="c-tag c-tag-mini c-defalut" @click="exit">
+                    <i class="fa fa-sign-out" aria-hidden="true"></i>
+                    退出
+                </span>
+                <span class="c-tag c-tag-mini c-defalut" @click="backup">
+                    后台
+                </span>
+            </div>
+        </header>
+        <main class="clearfix" v-if="isLoginSuccess">
+            <section class="clearfix">
+                <div class="menu">
+                    <div v-for="item in userMenus" :class="item.isActive?'menu-item menu-active':'menu-item'"
+                        @click="changeMenu(item)" :key="item">
+                        <i class="fa fa-bars" aria-hidden="true"></i>
+                        <a>{{item.menuItem}}</a>
+                        <span class="c-tag c-defalut c-tag-mini">{{item.dataNum}}</span>
+                    </div>
+                </div>
+                <figure class="table-status">
+                    <form v-on:submit.prevent="search">
+                        <div class="c-button c-button-round" style="margin-right: 10px;">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                            <input type="text" v-model="searchValue" autocomplete="off" class="c-input"
+                                placeholder="输入内容回车搜索" />
+                            <input type="submit" id="submit" style="display: none;">
+                        </div>
+                        <div class="c-button c-button-round" v-if="isHasPermissSubmitData"
+                            onclick="javascript:$('#dialog').attr('class', 'mark animated fadeInDownBig')">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                            <a>发起新内容</a>
+                        </div>
+                    </form>
+
+                </figure>
+                <figure class="table-name">
+                    <div class="item" v-for="item in tablefiledList" :key="item">
+                        <i :class="item.icon" aria-hidden="true"></i>
+                        {{item.name}}
+                    </div>
+                </figure>
+                <div class="container animated fadeIn" v-loading="tableLoading">
+                    <figure v-for="item in tableData" :key="item">
+                        <div class="item" v-for="(value,index) in item" :key="value">
+                            {{value}}
+                        </div>
+                    </figure>
+                </div>
+                <figure class="c-pagination">
+                    <el-pagination 
+                        background 
+                        layout="prev, pager, next" 
+                        :current-page="pageNumber"
+                        @current-change="changePage"
+                        :page-count="totalPage">
+                    </el-pagination>
+                </figure>
+            </section>
+        </main>
+        <div id="dialog" class="mark hidden" v-if="isHasPermissSubmitData">
+            <div class="dialog">
+                <div class="title">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                    新增
+                </div>
+                <div class="container">
+                    <form v-on:submit.prevent="submitData">
+                        <div class="form-item" v-for="item in submitDataList">
+                            <span class="label"><i :class="item.fieldicon" aria-hidden="true"></i>
+                                {{item.fieldName}}</span>
+                            <!-- <input class="c-input c-input-large"
+                                v-model="dialogField[item.paramName]"
+                                :placeholder="'请输入'+item.fieldName" required /> -->
+                            <el-input style="width: 250px;" v-if="item.inputType==='text'" size="mini"
+                                      v-model="dialogField[item.paramName]" :placeholder="'请输入'+item.fieldName"></el-input>
+                            <el-select style="width: 250px;" v-if="item.inputType==='select'"
+                                       v-model="dialogField[item.paramName]" size="mini" :placeholder="'请输入'+item.fieldName">
+                                <el-option v-for="option in item.types" :key="option" :label="option.typeName"
+                                           :value="option.typeCode">
+                                </el-option>
+                            </el-select>
+                            <el-date-picker style="width: 250px;" value-format="yyyy-MM-dd HH:mm:ss"  size="mini" v-if="item.inputType==='dateTime'" v-model="dialogField[item.paramName]" type="datetime" :placeholder="'请选择'+item.fieldName">
+                            </el-date-picker>
+                        </div>
+                        <input type="reset" id="reset-form" style="display: none;" />
+                        <input type="submit" id="submit-form" style="display: none;" />
+                    </form>
+
+                </div>
+                <div class="button-group">
+                    <div class="c-button c-button-round c-button-large" @click="javascript:$('#submit-form').click()">
+                        <i class="fa fa-envelope-o" aria-hidden="true"></i>
+                        发布
+                    </div>
+                    <div class="c-button c-button-round c-button-large c-button-plain"
+                         @click="$('#dialog').attr('class', 'mark animated fadeOutUpBig');$('#reset-form').click();dialogField={}">
+                        取消
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

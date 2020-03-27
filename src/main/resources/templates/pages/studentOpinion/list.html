@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html>
+
+<head th:insert="~{commons::head('楼栋管理',~{},~{},~{::script})}">
+	<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+	<!--[if lt IE 9]>
+	<script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+	<script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+</head>
+
+	<body>
+		<div class="weadmin-nav">
+			<span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">学生意见墙</a>
+        <a><cite>意见列表</cite></a>
+      </span>
+			<a class="layui-btn layui-btn-sm" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+				<i class="layui-icon" style="line-height:30px">ဂ</i></a>
+		</div>
+		<div class="weadmin-body">
+			<div class="layui-row">
+				<form class="layui-form layui-col-md12 we-search">
+					<!-- <div class="layui-inline">
+						<input class="layui-input" placeholder="开始日" name="start" id="start">
+					</div> -->
+					<!-- <div class="layui-inline">
+						<input class="layui-input" placeholder="采购时间" name="end" id="end">
+					</div>
+					<div class="layui-inline">
+						<input type="text" name="username" placeholder="订单号" autocomplete="off" class="layui-input">
+					</div> -->
+					<div class="layui-inline">
+						<input th:value="${result.condition.username}!=null?${result.condition.username}:''" type="text" name="username" placeholder="提交人" autocomplete="off" class="layui-input">
+					</div>
+					<div class="layui-inline">
+						<select name="typeId">
+							<option value="">选择意见类型</option>
+							<option th:selected="${result.condition.typeId == 8}" value="8">宿舍意见</option>
+							<option th:selected="${result.condition.typeId == 9}" value="9">食堂意见</option>
+							<option th:selected="${result.condition.typeId == 10}" value="10">教学楼意见</option>
+							<option th:selected="${result.condition.typeId == 11}" value="11">其他意见</option>
+						</select>
+					</div>
+					<!-- <div class="layui-inline">
+						<input type="text" name="username" placeholder="订单内容" autocomplete="off" class="layui-input">
+					</div> -->
+					<button class="layui-btn" lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+				</form>
+			</div>
+			<div class="weadmin-block">
+				<button class="layui-btn layui-btn-danger" onclick="_deleteSelectItem('suggest','http://localhost:8080/suggest/batch/delete', ()=>{
+					location.reload()
+				})">
+					<i class="layui-icon"></i>批量删除
+				</button>
+				<!-- <button class="layui-btn" onclick="WeAdminShow('添加订单','./add.html')"><i class="layui-icon"></i>添加</button> -->
+				<span class="fr" style="line-height:40px">共有数据：[[${result.count}]]条</span>
+			</div>
+			<table class="layui-table" id="suggest">
+				<thead>
+					<tr>
+						<th>
+							<div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
+						</th>
+						<th>序号</th>
+						<th>提交人</th>
+						<th>意见类型</th>
+						<th>内容</th>
+						<th>创建时间</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="suggest:${result.returnList.getList()}">
+						<td>
+							<div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='2'><i class="layui-icon">&#xe605;</i></div>
+						</td>
+						<td th:text="${suggest.id}">1</td>
+						<td th:text="${suggest.username}">周杰伦</td>
+						<td th:text="${suggest.typeId} == 8?'宿舍意见':(
+						${suggest.typeId} == 9?'食堂意见':(${suggest.typeId} == 10?'教学楼意见':'其他'))"></td>
+						<td th:text="${suggest.content}"></td>
+					    <td th:text="${#dates.format(suggest.createTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+						<td class="td-manage">
+							<a title="查看" onclick="_viewData($(this))" href="javascript:;">
+								<i class="layui-icon">&#xe63c;</i>
+							</a>
+							<a title="删除" th:onclick="_deleteById('http://localhost:8080/suggest/delete', [[${suggest.id}]])" href="javascript:;">
+								<i class="layui-icon">&#xe640;</i>
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="page" th:if="${result.count > 0}">
+				<div>
+					<a class="prev" th:href="${result.returnList.getPrePage() == 0} ? 'javascript:return false' : ${result.returnList.getPrePage()}">&lt;&lt;</a>
+					<th:block th:each="i: ${#numbers.sequence(1, result.returnList.getPages())}">
+						<a class="num" th:if="${i != result.activeId}"
+						   th:href="'/suggest/manage/' + ${i}+'?username='+(${result.condition.username}==null?'':${result.condition.username})+
+			   '&typeId='+(${result.condition.typeId}==null?'':${result.condition.typeId})"
+						   th:text="${i}"></a>
+						<span th:if="${i == result.activeId}" class="current" th:text="${i}"></span>
+					</th:block>
+					<a class="next" th:href="${result.returnList.getNextPage() == 0} ? 'javascript:return false' : ${result.returnList.getNextPage()}">&gt;&gt;</a>
+				</div>
+			</div>
+
+		</div>
+		<script>
+			layui.extend({
+				admin: 'http://localhost:8080/static/js/admin'
+			});
+			layui.use(['laydate', 'jquery', 'admin','form'], function () {
+				var laydate = layui.laydate,
+						$ = layui.jquery,
+						admin = layui.admin,
+						form = layui.form;
+				//提交表单
+				form.on('submit(formDemo)', function (data) {
+					if(data.field.id){
+						_saveData('http://localhost:8080/suggest/modify',data.field,()=>{
+							location.reload()
+						})
+
+					}else {
+						_saveData('http://localhost:8080/suggest/add',data.field,()=>{
+							window.location.href='http://localhost:8080/suggest/manage/1'
+						})
+					}
+					return false;
+				});
+
+			});
+			
+		</script>
+	</body>
+
+</html>

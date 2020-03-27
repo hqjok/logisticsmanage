@@ -1,0 +1,55 @@
+#端口
+server:
+  undertow:
+    url-charset: UTF-8
+  tomcat:
+    uri-encoding: UTF-8
+
+#配置数据源
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://localhost:3306/logisticsmanage?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+  thymeleaf:
+    suffix: .html
+    prefix: classpath:/templates/
+    cache: false
+    encoding: utf-8
+    servlet:
+      content-type: text/html
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+  jackson:
+    time-zone: GMT+8
+#    date-format: yyyy-MM-dd HH:mm:ss
+
+#上传图片路径
+file:
+  upload:
+    filepath: D:\logisticmanage\upload\image\
+
+#分页大小
+info:
+  pagination:
+    pageSize: 8
+
+#mybatis配置
+mybatis:
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  config-location: classpath:mybatis/mybatis-config.xml
+
+#pageHelper配置
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+
+
+logging:
+  level:
+    com.logistics.manage.mapper: debug
